@@ -10,8 +10,8 @@ local clientHRP = client.HumanoidRootPart
 
 
 local Window = Fluent:CreateWindow({
-    Title = "Fluent " .. Fluent.Version,
-    SubTitle = "by dawid",
+    Title = "Plink Slime RNG v1.0.0",
+    SubTitle = "by who?",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = false,
