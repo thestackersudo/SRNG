@@ -64,7 +64,14 @@ function Upgrade()
 end
 
 do
-
+	Tabs.Main:AddButton({
+        Title = "Discord",
+        Description = "Join the discord for updates <3 - ",
+        Callback = function()
+		Notify("Discord link copied to clipboard.")
+			setclipboard("https://discord.gg/hJCn7UnkVZ")
+        end
+    })
 	
     local AutoRoll = Tabs.Main:AddToggle("AutoRoll", {Title = "Auto Roll", Default = false })
 
@@ -166,7 +173,7 @@ do
 		Notify("Auto TP To Player Toggled", tostring(Options.AutoTPToPlayer.Value))
         task.spawn(function() 
 			while Options.AutoTPToPlayer.Value == true do
-				task.wait(0.1)
+				task.wait(1)
 				local player = workspace[PlayerInput.Value]
 				if player then
 					clientHRP.CFrame = player.HumanoidRootPart.CFrame
