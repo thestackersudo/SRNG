@@ -166,7 +166,7 @@ do
 		Notify("Auto TP To Player Toggled", tostring(Options.AutoTPToPlayer.Value))
         task.spawn(function() 
 			while Options.AutoTPToPlayer.Value == true do
-				task.wait(1)
+				task.wait(0.1)
 				local player = workspace[PlayerInput.Value]
 				if player then
 					clientHRP.CFrame = player.HumanoidRootPart.CFrame
