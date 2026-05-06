@@ -4,6 +4,9 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local players = game:GetService("Players")
+local GuiService = game:GetService("GuiService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local UserInputService = game:GetService("UserInputService")
 local localPlayer = players.LocalPlayer
 local client = workspace:FindFirstChild(localPlayer.Name)
 local clientHRP = client.HumanoidRootPart
@@ -44,9 +47,38 @@ function PrintTable(table)
 	end
 end
 
+local function getUpgradeTiles()
+	local playerGui = game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+	if not playerGui then return nil end
+
+	local root = playerGui:FindFirstChild("Root")
+	if not root then return nil end
+
+	local upgradeScreen = root:FindFirstChild("UpgradeScreen")
+	if not upgradeScreen then return nil end
+
+	local upgradeContent = upgradeScreen:FindFirstChild("UpgradeContent")
+	if not upgradeContent then return nil end
+
+	local frame = upgradeContent:FindFirstChild("Frame")
+	if not frame then return nil end
+
+	return frame:GetChildren()
+end
+
 function Upgrade()
 	task.wait()
-	local upgradeTiles = game:GetService("Players").LocalPlayer.PlayerGui.Root.UpgradeScreen.UpgradeContent.Frame:GetChildren()
+	mousemoveabs(1125, 908)
+	mousemoveabs(1126, 908)
+	mousemoveabs(1127, 908)
+	task.wait(0.2)
+	mouse1click()
+	mousemoveabs(958, 922)
+	mousemoveabs(959, 922)
+	mousemoveabs(960, 922)
+	task.wait(0.2)
+	mouse1click()
+	local upgradeTiles = getUpgradeTiles()
 
 	if upgradeTiles then
 		for _,tile in pairs(upgradeTiles) do
@@ -63,6 +95,73 @@ function Upgrade()
 	end
 end
 
+local function getTeleportZones()
+	local playerGui = game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+	if not playerGui then return nil end
+
+	local root = playerGui:FindFirstChild("Root")
+	if not root then return nil end
+
+	local teleporter = root:FindFirstChild("Teleporter")
+	if not teleporter then return nil end
+
+	local content = teleporter:FindFirstChild("Content")
+	if not content then return nil end
+
+	local frame = content:FindFirstChild("Frame")
+	if not frame then return nil end
+
+	local scrollingFrame = frame:FindFirstChild("ScrollingFrame")
+	if not scrollingFrame then return nil end
+
+	return scrollingFrame:GetChildren()
+end
+
+function TeleportBestZone()
+	task.wait()
+	mousemoveabs(1838, 706)
+	mousemoveabs(1839, 706)
+	mousemoveabs(1840, 706)
+	task.wait(0.2)
+	mouse1click()
+	mousemoveabs(1474, 196)
+	mousemoveabs(1475, 196)
+	mousemoveabs(1476, 196)
+	task.wait(0.2)
+	mouse1click()
+	
+	local teleportZones = getTeleportZones()
+	local availableZones = {}
+
+	if teleportZones then
+		for _,imageLabel in pairs(teleportZones) do
+			if imageLabel.Name ~= "UIListLayout" and imageLabel.Name ~= "UIPadding" then
+				if imageLabel.Visible == true then
+					for _,TextLabelFrame in pairs(imageLabel:GetChildren()) do
+						if TextLabelFrame.Name ~= "ImageButton" then
+							if TextLabelFrame.Position.X.Scale > 0.08 then
+								table.insert(availableZones, imageLabel.LayoutOrder, TextLabelFrame.TextLabel.Text)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	local tableAmount = #availableZones
+	Teleport(tableAmount)
+end
+
+function Teleport(worldNum)
+	local args = {
+	"requestTeleportZone",
+	worldNum
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("ZonesService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+end
+
 do
 	Tabs.Main:AddButton({
         Title = "Discord",
@@ -72,7 +171,31 @@ do
 			setclipboard("https://discord.gg/hJCn7UnkVZ")
         end
     })
+
+	-- Tabs.Main:AddButton({
+    --     Title = "Debug Button",
+    --     Description = "Prolly Does Nothing",
+    --     Callback = function()
+	-- 		TeleportBestZone()
+			
+    --     end
+    -- })
 	
+	-- local Keybind = Tabs.Main:AddKeybind("Keybind", {
+    --     Title = "Debug Keybind",
+    --     Mode = "Toggle", -- Always, Toggle, Hold
+    --     Default = "K",
+
+    --     Callback = function(Value)
+    --         print(UserInputService:GetMouseLocation())
+    --     end,
+
+    --     -- Occurs when the keybind itself is changed, `New` is a KeyCode Enum OR a UserInputType Enum
+    --     ChangedCallback = function(New)
+    --         print("Keybind changed!", New)
+    --     end
+    -- })
+
     local AutoRoll = Tabs.Main:AddToggle("AutoRoll", {Title = "Auto Roll", Default = false })
 
     AutoRoll:OnChanged(function()
@@ -103,6 +226,8 @@ do
 						for _,dropChild in pairs(drop:GetChildren()) do
 							if dropChild.Name ~= "LootHighlight" then
 								TP(dropChild.CFrame.X, dropChild.CFrame.Y, dropChild.CFrame.Z)
+								task.wait(0.3)
+								TeleportBestZone()
 							end
 						end
 					end
@@ -111,7 +236,11 @@ do
 			end
 		end)
     end)
-
+	
+	Tabs.Main:AddParagraph({
+        Title = "Interval Info",
+        Content = "Auto Upgrade and Auto Best Zone are a little annoying\n it controls your cursor to open the menus to find its values.\n As such i thought it be appropriate i allow the user to customise their to their preference."
+    })
 
 	local AutoUpgrade = Tabs.Main:AddToggle("AutoUpgrade", {Title = "Auto Upgrade", Default = false })
 
@@ -120,17 +249,51 @@ do
         task.spawn(function() 
 			while Options.AutoUpgrade.Value == true do
 				Upgrade()
+				task.wait(Options.AutoUpgradeInterval.Value)
+			end
+		end)
+    end)
+	
+	local AutoUpgradeInterval = Tabs.Main:AddInput("AutoUpgradeInterval", {
+        Title = "Auto Upgrade Interval",
+        Default = "30",
+        Placeholder = "10",
+        Numeric = true, -- Only allows numbers
+        Finished = false, -- Only calls callback when you press enter
+        Callback = function(Value)
+        end
+    })
+
+
+	local AutoTeleportBestZone = Tabs.Main:AddToggle("AutoTeleportBestZone", {Title = "Auto Best Zone", Default = false })
+
+    AutoTeleportBestZone:OnChanged(function()
+		Notify("Auto Best Zone Toggled", tostring(Options.AutoTeleportBestZone.Value))
+        task.spawn(function() 
+			while Options.AutoTeleportBestZone.Value == true do
+				TeleportBestZone()
+				task.wait(Options.AutoBestZoneInterval.Value)
 			end
 		end)
     end)
 
+	local AutoBestZoneInterval = Tabs.Main:AddInput("AutoBestZoneInterval", {
+        Title = "Auto Best Zone Interval",
+        Default = "30",
+        Placeholder = "10",
+        Numeric = true, -- Only allows numbers
+        Finished = false, -- Only calls callback when you press enter
+        Callback = function(Value)
+        end
+    })
 
-	local AutoZone = Tabs.Main:AddToggle("AutoZone", {Title = "Auto Zone", Default = false })
 
-    AutoZone:OnChanged(function()
-		Notify("Auto Upgrade Toggled", tostring(Options.AutoZone.Value))
+	local AutoBuyZone = Tabs.Main:AddToggle("AutoBuyZone", {Title = "Auto Buy Zone", Default = false })
+
+    AutoBuyZone:OnChanged(function()
+		Notify("Auto Buy Zone Toggled", tostring(Options.AutoBuyZone.Value))
         task.spawn(function() 
-			while Options.AutoZone.Value == true do
+			while Options.AutoBuyZone.Value == true do
 				local args = {
 				"requestPurchaseZone"
 				}
@@ -139,6 +302,8 @@ do
 			end
 		end)
     end)
+
+	
 
 
 	local AutoRebirth = Tabs.Main:AddToggle("AutoRebirth", {Title = "Auto Rebirth", Default = false })
@@ -159,7 +324,7 @@ do
 
 	local PlayerInput = Tabs.Main:AddInput("PlayerInput", {
         Title = "Player Input",
-        Default = "Blackwind101",
+        Default = "Gassy",
         Placeholder = "Placeholder",
         Numeric = false, -- Only allows numbers
         Finished = false, -- Only calls callback when you press enter
@@ -174,17 +339,28 @@ do
         task.spawn(function() 
 			while Options.AutoTPToPlayer.Value == true do
 				task.wait(1)
-				local player = workspace[PlayerInput.Value]
-				if player then
-					clientHRP.CFrame = player.HumanoidRootPart.CFrame
-				else
-					Notify("Player not Found.", "Enter a valid player name in the box below.")
-				end
+				TPToPlayer()
 			end
 		end)
     end)
 
-	
+	local AutoEquipBest = Tabs.Main:AddToggle("AutoEquipBest", {Title = "Auto Equip Best", Default = false })
+
+    AutoEquipBest:OnChanged(function()
+		Notify("Auto Equip Best Toggle", tostring(Options.AutoEquipBest.Value))
+        task.spawn(function() 
+			while Options.AutoEquipBest.Value == true do
+				local args = {
+				"requestEquipBest"
+				}
+				game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("InventoryService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+				task.wait(10)
+				Notify("Equipped Best", "Equipped best pets.")
+			end
+		end)
+    end)
+
+
 
 end
 
