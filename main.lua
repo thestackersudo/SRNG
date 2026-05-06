@@ -153,6 +153,22 @@ function TeleportBestZone()
 	Teleport(tableAmount)
 end
 
+function ClaimIndex()
+	local args = {
+	"requestClaimReward",
+	"basic"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("IndexService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+	task.wait(0.1)
+	local args = {
+	"requestClaimReward",
+	"big"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("IndexService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+	task.wait(0.1)
+
+end
+
 function Teleport(worldNum)
 	local args = {
 	"requestTeleportZone",
@@ -225,9 +241,9 @@ do
 					if drop then
 						for _,dropChild in pairs(drop:GetChildren()) do
 							if dropChild.Name ~= "LootHighlight" then
-								TP(dropChild.CFrame.X, dropChild.CFrame.Y, dropChild.CFrame.Z)
+								dropChild.CFrame = CFrame.new(clientHRP.CFrame.X,clientHRP.CFrame.Y,clientHRP.CFrame.Z)
+								-- dropChild.CFrame.X, dropChild.CFrame.Y, dropChild.CFrame.Z
 								task.wait(0.3)
-								TeleportBestZone()
 							end
 						end
 					end
