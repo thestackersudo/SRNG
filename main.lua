@@ -1,19 +1,21 @@
-_G.autoUpgrade = false
-
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
 local UserInputService = game:GetService("UserInputService")
+local VirtualUser = game:GetService("VirtualUser")
 local localPlayer = players.LocalPlayer
 local client = workspace:FindFirstChild(localPlayer.Name)
 local clientHRP = client.HumanoidRootPart
 
+localPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
 
 local Window = Fluent:CreateWindow({
-    Title = "Plink Slime RNG v1.0.0",
+    Title = "Plink Slime RNG v1.0.2",
     SubTitle = "by who?",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
@@ -156,7 +158,23 @@ function ClaimIndex()
 	}
 	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("IndexService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
 	task.wait(0.1)
-
+	local args = {
+	"requestClaimReward",
+	"huge"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("IndexService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+	task.wait(0.1)
+	local args = {
+	"requestClaimReward",
+	"shiny"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("IndexService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+	task.wait(0.1)
+	local args = {
+	"requestClaimReward",
+	"inverted"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("IndexService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
 end
 
 function Teleport(worldNum)
@@ -210,6 +228,18 @@ do
 			while Options.AutoRoll.Value == true do
 				task.wait(tonumber(string.match(game:GetService("Players").LocalPlayer.PlayerGui.Root.BottomBarStats.StatsList.RollSpeedStat.Content.Value.TextLabel.Text, "[%d%.]+")))
 				Roll()
+			end
+		end)
+    end)
+
+	local AutoIndex = Tabs.Main:AddToggle("AutoIndex", {Title = "Auto Index", Default = false })
+
+    AutoIndex:OnChanged(function()
+		Notify("Auto Index Toggled", tostring(Options.AutoIndex.Value))
+        task.spawn(function() 
+			while Options.AutoIndex.Value == true do
+				task.wait(30)
+				ClaimIndex()
 			end
 		end)
     end)
