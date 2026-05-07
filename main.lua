@@ -131,6 +131,29 @@ function Roll()
 	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("RollService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
 end
 
+function ConsumePotions()
+	local args = {
+	"requestUseBoost",
+	"luck"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("BoostService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+	local args = {
+	"requestUseBoost",
+	"ultraLuck"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("BoostService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+	local args = {
+	"requestUseBoost",
+	"currency"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("BoostService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+	local args = {
+	"requestUseBoost",
+	"rollSpeed"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("BoostService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+end
 
 local function getTeleportZones()
 	local playerGui = game.Players.LocalPlayer:FindFirstChild("PlayerGui")
@@ -388,24 +411,14 @@ do
 		end)
     end)
 
-	local PlayerInput = Tabs.Main:AddInput("PlayerInput", {
-        Title = "Player Input",
-        Default = "Gassy",
-        Placeholder = "Placeholder",
-        Numeric = false, -- Only allows numbers
-        Finished = false, -- Only calls callback when you press enter
-        Callback = function(Value)
-        end
-    })
-	
-	local AutoTPToPlayer = Tabs.Main:AddToggle("AutoTPToPlayer", {Title = "Auto TP To Player", Default = false })
+	local AutoPotions = Tabs.Main:AddToggle("AutoPotions", {Title = "Auto Potions", Default = false })
 
-    AutoTPToPlayer:OnChanged(function()
-		Notify("Auto TP To Player Toggled", tostring(Options.AutoTPToPlayer.Value))
+    AutoPotions:OnChanged(function()
+		Notify("Auto Potions Toggled", tostring(Options.AutoPotions.Value))
         task.spawn(function() 
-			while Options.AutoTPToPlayer.Value == true do
-				task.wait(1)
-				TPToPlayer()
+			while Options.AutoPotions.Value == true do
+				ConsumePotions()
+				task.wait(3)
 			end
 		end)
     end)
@@ -493,4 +506,3 @@ SaveManager:LoadAutoloadConfig()
 -- 		end
 -- 	end,
 -- }
-
