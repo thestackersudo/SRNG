@@ -118,39 +118,31 @@ local function getTeleportZones()
 end
 
 function TeleportBestZone()
-	task.wait()
-	mousemoveabs(1838, 706)
-	mousemoveabs(1839, 706)
-	mousemoveabs(1840, 706)
-	task.wait(0.2)
-	mouse1click()
-	mousemoveabs(1474, 196)
-	mousemoveabs(1475, 196)
-	mousemoveabs(1476, 196)
-	task.wait(0.2)
-	mouse1click()
-	
-	local teleportZones = getTeleportZones()
-	local availableZones = {}
+local zones = workspace.Zones:GetChildren()
+local returnZones = {}
+local unlockedZones = {}
 
-	if teleportZones then
-		for _,imageLabel in pairs(teleportZones) do
-			if imageLabel.Name ~= "UIListLayout" and imageLabel.Name ~= "UIPadding" then
-				if imageLabel.Visible == true then
-					for _,TextLabelFrame in pairs(imageLabel:GetChildren()) do
-						if TextLabelFrame.Name ~= "ImageButton" then
-							if TextLabelFrame.Position.X.Scale > 0.08 then
-								table.insert(availableZones, imageLabel.LayoutOrder, TextLabelFrame.TextLabel.Text)
-							end
-						end
-					end
-				end
-			end
+for _,zone in pairs(zones) do
+	local blockerName = "ClientGateBlocker_" .. zone.Name
+	
+	local gate = zone.Gate:FindFirstChild(blockerName)
+
+	if gate then
+		table.insert(returnZones, gate)
+	end
+end
+
+local counter = 0
+for _,gateBlocker in pairs(returnZones) do
+	if gateBlocker.CanCollide ~= true then
+		if tonumber(gateBlocker.Parent.Parent.Name) > counter then
+			counter = tonumber(gateBlocker.Parent.Parent.Name)
 		end
 	end
-	
-	local tableAmount = #availableZones
-	Teleport(tableAmount)
+end
+counter = counter + 1
+
+	Teleport(counter)
 end
 
 function ClaimIndex()
