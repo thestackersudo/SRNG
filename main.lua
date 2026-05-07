@@ -24,6 +24,7 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "" }),
+	Upgrades = Window:AddTab({ Title = "Upgrades", Icon = "" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -67,17 +68,6 @@ local function getUpgradeTiles()
 end
 
 function Upgrade()
-	task.wait()
-	mousemoveabs(1125, 908)
-	mousemoveabs(1126, 908)
-	mousemoveabs(1127, 908)
-	task.wait(0.2)
-	mouse1click()
-	mousemoveabs(958, 922)
-	mousemoveabs(959, 922)
-	mousemoveabs(960, 922)
-	task.wait(0.2)
-	mouse1click()
 	local upgradeTiles = getUpgradeTiles()
 
 	if upgradeTiles then
@@ -94,6 +84,14 @@ function Upgrade()
 		end
 	end
 end
+
+function Roll()
+	local args = {
+	"requestRoll"
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("RollService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+end
+
 
 local function getTeleportZones()
 	local playerGui = game.Players.LocalPlayer:FindFirstChild("PlayerGui")
@@ -210,12 +208,8 @@ do
 		Notify("Auto Roll Toggled", tostring(Options.AutoRoll.Value))
         task.spawn(function() 
 			while Options.AutoRoll.Value == true do
-				task.wait()
-				local args = {
-				"requestRoll"
-				}
-				game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("RollService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
-
+				task.wait(tonumber(string.match(game:GetService("Players").LocalPlayer.PlayerGui.Root.BottomBarStats.StatsList.RollSpeedStat.Content.Value.TextLabel.Text, "[%d%.]+")))
+				Roll()
 			end
 		end)
     end)
@@ -245,12 +239,7 @@ do
 		end)
     end)
 	
-	Tabs.Main:AddParagraph({
-        Title = "Interval Info",
-        Content = "Auto Upgrade and Auto Best Zone are a little annoying\n it controls your cursor to open the menus to find its values.\n As such i thought it be appropriate i allow the user to customise their to their preference."
-    })
-
-	local AutoUpgrade = Tabs.Main:AddToggle("AutoUpgrade", {Title = "Auto Upgrade", Default = false })
+	local AutoUpgrade = Tabs.Upgrades:AddToggle("AutoUpgrade", {Title = "Auto Upgrade", Default = false })
 
     AutoUpgrade:OnChanged(function()
 		Notify("Auto Upgrade Toggled", tostring(Options.AutoUpgrade.Value))
@@ -262,7 +251,7 @@ do
 		end)
     end)
 	
-	local AutoUpgradeInterval = Tabs.Main:AddInput("AutoUpgradeInterval", {
+	local AutoUpgradeInterval = Tabs.Upgrades:AddInput("AutoUpgradeInterval", {
         Title = "Auto Upgrade Interval",
         Default = "30",
         Placeholder = "10",
@@ -296,7 +285,7 @@ do
     })
 
 
-	local AutoBuyZone = Tabs.Main:AddToggle("AutoBuyZone", {Title = "Auto Buy Zone", Default = false })
+	local AutoBuyZone = Tabs.Upgrades:AddToggle("AutoBuyZone", {Title = "Auto Buy Zone", Default = false })
 
     AutoBuyZone:OnChanged(function()
 		Notify("Auto Buy Zone Toggled", tostring(Options.AutoBuyZone.Value))
@@ -314,7 +303,7 @@ do
 	
 
 
-	local AutoRebirth = Tabs.Main:AddToggle("AutoRebirth", {Title = "Auto Rebirth", Default = false })
+	local AutoRebirth = Tabs.Upgrades:AddToggle("AutoRebirth", {Title = "Auto Rebirth", Default = false })
 
     AutoRebirth:OnChanged(function()
 		Notify("Auto Rebirth Toggled", tostring(Options.AutoRebirth.Value))
@@ -352,7 +341,7 @@ do
 		end)
     end)
 
-	local AutoEquipBest = Tabs.Main:AddToggle("AutoEquipBest", {Title = "Auto Equip Best", Default = false })
+	local AutoEquipBest = Tabs.Upgrades:AddToggle("AutoEquipBest", {Title = "Auto Equip Best", Default = false })
 
     AutoEquipBest:OnChanged(function()
 		Notify("Auto Equip Best Toggle", tostring(Options.AutoEquipBest.Value))
