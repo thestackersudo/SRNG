@@ -3,6 +3,7 @@ local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/d
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local players = game:GetService("Players")
 local GuiService = game:GetService("GuiService")
+local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 local localPlayer = players.LocalPlayer
@@ -15,7 +16,7 @@ localPlayer.Idled:Connect(function()
 end)
 
 local Window = Fluent:CreateWindow({
-    Title = "Plink Slime RNG v1.0.2",
+    Title = "Plink Slime RNG v1.0.3",
     SubTitle = "by who?",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
@@ -27,10 +28,46 @@ local Window = Fluent:CreateWindow({
 local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "" }),
 	Upgrades = Window:AddTab({ Title = "Upgrades", Icon = "" }),
+	Webhooks = Window:AddTab({ Title = "Webhooks", Icon = "" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
 local Options = Fluent.Options
+
+function SendDiscordWebhook(url, data)
+	local createdBody = CreateDiscordEmbeds(data)
+	return Post(url, createdBody)
+end
+
+function Post(url,body)
+	request({
+	Url = url,
+	Method = "POST",
+	Headers = {
+		["Content-Type"] = "application/json"
+	},
+	Body = body
+	})
+end
+
+function CreateDiscordEmbeds(data)
+	local body = {
+		content = data.content,
+		embeds = {
+			{
+				title = data.title,
+				description = data.description,
+				color = 5814783,
+				footer = {
+					text = "Plink Utils"
+				},
+				timestamp = DateTime.now():ToIsoDate(),
+			}
+		},
+		attachments = {}
+	}
+	return HttpService:JSONEncode(body)
+end
 
 function Notify(title, content)
 	Fluent:Notify({
@@ -196,14 +233,16 @@ do
         end
     })
 
-	-- Tabs.Main:AddButton({
-    --     Title = "Debug Button",
-    --     Description = "Prolly Does Nothing",
-    --     Callback = function()
-	-- 		TeleportBestZone()
-			
-    --     end
-    -- })
+	Tabs.Main:AddButton({
+        Title = "Debug Button",
+        Description = "Prolly Does Nothing",
+        Callback = function()
+			SendDiscordWebhook("https://discord.com/api/webhooks/1501937952308072639/928if4VylIqCEL-42A8EhjJrfuT3wdL4O5JMrINdLgrfD5goblIlEbuzUEOcN0wK0k6h", {
+				title="y",
+				description="g"
+			})
+        end
+    })
 	
 	-- local Keybind = Tabs.Main:AddKeybind("Keybind", {
     --     Title = "Debug Keybind",
@@ -388,7 +427,41 @@ do
     end)
 
 
+	--Webhooks
+	local Webhook = Tabs.Webhooks:AddToggle("Webhook", {Title = "Webhook", Default = false })
 
+    Webhook:OnChanged(function()
+		Notify("Webhook Toggled", tostring(Options.Webhook.Value))
+        task.spawn(function() 
+			while Options.Webhook.Value == true do
+				SendDiscordWebhook(Options.WebhookUrl.Value, {
+					title = localPlayer.Name,
+					description = workspace:FindFirstChild(localPlayer.Name).HumanoidRootPart.TitleGui.NumRolls.Text
+				})
+				task.wait(tonumber(Options.WebhookInterval.Value))
+			end
+		end)
+    end)
+	
+	local WebhookUrl = Tabs.Webhooks:AddInput("WebhookUrl", {
+        Title = "Webhook URL",
+        Default = "",
+        Placeholder = "WEBHOOK URL",
+        Numeric = false, -- Only allows numbers
+        Finished = false, -- Only calls callback when you press enter
+        Callback = function(Value)
+        end
+    })
+
+	local WebhookInterval = Tabs.Webhooks:AddInput("WebhookInterval", {
+        Title = "Webhook Interval",
+        Default = "30",
+        Placeholder = "10",
+        Numeric = true, -- Only allows numbers
+        Finished = false, -- Only calls callback when you press enter
+        Callback = function(Value)
+        end
+    })
 end
 
 
@@ -411,3 +484,13 @@ Fluent:Notify({
     Duration = 8
 })
 SaveManager:LoadAutoloadConfig()
+
+
+-- local metaTable = {
+-- 	__tostring = function(table) 
+-- 		for i,v in pairs(table) do
+-- 			print(i,v)
+-- 		end
+-- 	end,
+-- }
+
