@@ -1,4 +1,6 @@
-repeat task.wait() until game:IsLoaded() end
+-- https://discord.gg/hJCn7UnkVZ
+
+repeat task.wait() until game:IsLoaded()
 
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
@@ -42,14 +44,19 @@ function SendDiscordWebhook(url, data)
 end
 
 function Post(url,body)
-	request({
-	Url = url,
-	Method = "POST",
-	Headers = {
+	if url then
+		request({
+		Url = url,
+		Method = "POST",
+		Headers = {
 		["Content-Type"] = "application/json"
-	},
-	Body = body
+		},
+		Body = body
 	})
+	else
+		Notify("Failed to send Webhook.")
+	end
+	
 end
 
 function CreateDiscordEmbeds(data)
@@ -439,21 +446,6 @@ do
 
 
 	--Webhooks
-	local Webhook = Tabs.Webhooks:AddToggle("Webhook", {Title = "Webhook", Default = false })
-
-    Webhook:OnChanged(function()
-		Notify("Webhook Toggled", tostring(Options.Webhook.Value))
-        task.spawn(function() 
-			while Options.Webhook.Value == true do
-				SendDiscordWebhook(Options.WebhookUrl.Value, {
-					title = localPlayer.Name,
-					description = workspace:FindFirstChild(localPlayer.Name).HumanoidRootPart.TitleGui.NumRolls.Text
-				})
-				task.wait(tonumber(Options.WebhookInterval.Value))
-			end
-		end)
-    end)
-	
 	local WebhookUrl = Tabs.Webhooks:AddInput("WebhookUrl", {
         Title = "Webhook URL",
         Default = "",
@@ -463,6 +455,23 @@ do
         Callback = function(Value)
         end
     })
+
+	local Webhook = Tabs.Webhooks:AddToggle("Webhook", {Title = "Webhook", Default = false })
+
+    Webhook:OnChanged(function()
+		Notify("Webhook Toggled", tostring(Options.Webhook.Value))
+        task.spawn(function() 
+			while Options.Webhook.Value == true do
+				task.wait()
+				SendDiscordWebhook(Options.WebhookUrl.Value, {
+					title = localPlayer.Name,
+					description = workspace:FindFirstChild(localPlayer.Name).HumanoidRootPart.TitleGui.NumRolls.Text
+				})
+				task.wait(tonumber(Options.WebhookInterval.Value))
+			end
+		end)
+    end)
+	
 
 	local WebhookInterval = Tabs.Webhooks:AddInput("WebhookInterval", {
         Title = "Webhook Interval",
