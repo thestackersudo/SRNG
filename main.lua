@@ -260,10 +260,6 @@ do
         Title = "Debug Button",
         Description = "Prolly Does Nothing",
         Callback = function()
-			SendDiscordWebhook("https://discord.com/api/webhooks/1501937952308072639/928if4VylIqCEL-42A8EhjJrfuT3wdL4O5JMrINdLgrfD5goblIlEbuzUEOcN0wK0k6h", {
-				title="y",
-				description="g"
-			})
         end
     })
 	
