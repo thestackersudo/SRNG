@@ -118,19 +118,29 @@ end
 function Upgrade()
 	local upgradeTiles = getUpgradeTiles()
 
-	if upgradeTiles then
-		for _,tile in pairs(upgradeTiles) do
-				if tile.Name ~= "UIAspectRatioConstraint" or tile.Name ~= "UpgradeHoverInfo" then
-				local upgrade = tile.Name:match("^(%S+)Tile")
-
-				local args = {
-				"requestUnlock",
-				upgrade
-				}
-				game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("UpgradeService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+if upgradeTiles then
+	for _,tile in pairs(upgradeTiles) do
+		if tile.Name == "UIAspectRatioConstraint" or tile.Name == "UpgradeHoverInfo" then continue end
+			local imageChildren = tile.ImageLabel:GetChildren()
+			local upgradeBackground = tile.ImageLabel.Image
+				for _,label in pairs(imageChildren) do
+					
+					if label.Name == "TextLabelFrame" then
+						local prefix = label:FindFirstChild("Prefix")
+						if prefix then
+							if label.TextLabel.TextColor3:ToHex() ~= "ff2d49" and upgradeBackground == "rbxassetid://127271823919078" then
+								local upgrade = tile.Name:match("^(%S+)Tile")
+								local args = {
+								"requestUnlock",
+								upgrade
+								}
+								game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("UpgradeService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+							end	
+						end
+					end
+				end		
 			end
 		end
-	end
 end
 
 function Roll()
@@ -335,6 +345,11 @@ do
 			end
 		end)
     end)
+
+	 Tabs.Upgrades:AddParagraph({
+        Title = "Auto Upgrade works on a interval.",
+        Content = "You have to open the upgrade menu sometimes for this to function correctly, \nwhen the game doesnt detect the menu is active the remote doesnt fire."
+    })
 	
 	local AutoUpgrade = Tabs.Upgrades:AddToggle("AutoUpgrade", {Title = "Auto Upgrade", Default = false })
 
