@@ -20,7 +20,7 @@ localPlayer.Idled:Connect(function()
 end)
 
 local Window = Fluent:CreateWindow({
-    Title = "Plink Slime RNG v1.0.32",
+    Title = "Plink Slime RNG v1.0.31",
     SubTitle = "by who?",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
@@ -321,21 +321,20 @@ do
 		end)
     end)
 
-	local AutoFarm = Tabs.Main:AddToggle("AutoFarm", {Title = "Auto Farm", Default = false })
+	local AutoDrops = Tabs.Main:AddToggle("AutoDrops", {Title = "Auto Drops", Default = false })
 
-    AutoFarm:OnChanged(function()
-		Notify("Auto Farm Toggled", tostring(Options.AutoFarm.Value))
+    AutoDrops:OnChanged(function()
+		Notify("Auto Collect Drops Toggled", tostring(Options.AutoDrops.Value))
         task.spawn(function() 
-			while Options.AutoFarm.Value == true do
+			while Options.AutoDrops.Value == true do
 				task.wait()
 				local drops = workspace.Loot:GetChildren()
 				
 				for _,drop in pairs(drops) do
 					if drop then
 						for _,dropChild in pairs(drop:GetChildren()) do
-							if dropChild.Name ~= "LootHighlight" then
-								dropChild.CFrame = CFrame.new(clientHRP.CFrame.X,clientHRP.CFrame.Y,clientHRP.CFrame.Z)
-								-- dropChild.CFrame.X, dropChild.CFrame.Y, dropChild.CFrame.Z
+							if drop:FindFirstChild("Root") then
+								drop.Root.CFrame = CFrame.new(clientHRP.CFrame.X,clientHRP.CFrame.Y,clientHRP.CFrame.Z)
 								task.wait(0.3)
 							end
 						end
