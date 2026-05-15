@@ -20,7 +20,7 @@ localPlayer.Idled:Connect(function()
 end)
 
 local Window = Fluent:CreateWindow({
-    Title = "Plink Slime RNG v1.0.31",
+    Title = "Plink Slime RNG v1.0.33",
     SubTitle = "by who?",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
