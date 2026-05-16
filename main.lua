@@ -265,6 +265,23 @@ function Teleport(worldNum)
 
 end
 
+function CollectDrops()
+	local drops = workspace.Loot:GetChildren()
+				
+	for _,drop in pairs(drops) do
+		if drop then
+			for _,dropChild in pairs(drop:GetChildren()) do
+				if drop:FindFirstChild("Root") then
+					local prox = drop.Root:FindFirstChild("Attachment"):FindFirstChild("ProximityPrompt")
+					fireproximityprompt(prox)
+					drop.Root.CFrame = CFrame.new(clientHRP.CFrame.X,clientHRP.CFrame.Y,clientHRP.CFrame.Z)
+					task.wait(0.3)
+				end
+			end
+		end
+	end
+end
+
 do
 	Tabs.Main:AddButton({
         Title = "Discord",
@@ -328,19 +345,15 @@ do
         task.spawn(function() 
 			while Options.AutoDrops.Value == true do
 				task.wait()
-				local drops = workspace.Loot:GetChildren()
-				
-				for _,drop in pairs(drops) do
-					if drop then
-						for _,dropChild in pairs(drop:GetChildren()) do
-							if drop:FindFirstChild("Root") then
-								drop.Root.CFrame = CFrame.new(clientHRP.CFrame.X,clientHRP.CFrame.Y,clientHRP.CFrame.Z)
-								task.wait(0.3)
-							end
-						end
-					end
+				local success,response = pcall(function() 
+					CollectDrops()
+				end)		
+				if success then
+					continue
+				else
+					print(response)
+					continue
 				end
-			
 			end
 		end)
     end)
