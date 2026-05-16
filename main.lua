@@ -273,7 +273,9 @@ function CollectDrops()
 			for _,dropChild in pairs(drop:GetChildren()) do
 				if drop:FindFirstChild("Root") then
 					drop.Root.CFrame = CFrame.new(clientHRP.CFrame.X,clientHRP.CFrame.Y,clientHRP.CFrame.Z)
-					if drop.Root:FindFirstChild("Attachment"):FindFirstChild("ProximityPrompt") then
+
+					if drop.Root:FindFirstChild("Attachment") then
+						local prox = drop.Root.Attachment:FindFirstChild("ProximityPrompt")
 						fireproximityprompt(prox)
 					end
 					task.wait(0.3)
