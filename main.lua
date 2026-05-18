@@ -285,6 +285,34 @@ function CollectDrops()
 	end
 end
 
+function FindGameplayFolder()
+	for i,v in workspace:GetChildren() do
+		if string.match(v.Name, "Gameplay(%d*)") then
+			return workspace:FindFirstChild(v.Name)
+		end
+	end
+end
+
+function FindEnemies()
+	local gameplayFolder = FindGameplayFolder()
+	local enemies = gameplayFolder.Enemies:GetChildren()
+	local tbl = {}
+
+	for _,enemy in pairs(enemies) do
+		table.insert(tbl, enemy)
+	end
+	return tbl
+end
+
+function FireSlimeGun(id)
+	local args = {
+	"tryFireSlimeGun",
+	id -- Enemy ID
+	}
+	game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("leifstout_networker@0.3.1"):WaitForChild("networker"):WaitForChild("_remotes"):WaitForChild("SlimeGunService"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+end
+
+
 do
 	Tabs.Main:AddButton({
         Title = "Discord",
@@ -360,6 +388,47 @@ do
 			end
 		end)
     end)
+
+
+	local AutoPotions = Tabs.Main:AddToggle("AutoPotions", {Title = "Auto Potions", Default = false })
+
+    AutoPotions:OnChanged(function()
+		Notify("Auto Potions Toggled", tostring(Options.AutoPotions.Value))
+        task.spawn(function() 
+			while Options.AutoPotions.Value == true do
+				ConsumePotions()
+				task.wait(3)
+			end
+		end)
+    end)
+
+	local AutoSlimeGun = Tabs.Main:AddToggle("AutoSlimeGun", {Title = "Auto Slime Gun", Default = false })
+
+    AutoSlimeGun:OnChanged(function()
+		Notify("Auto Slime Gun Toggled", tostring(Options.AutoSlimeGun.Value))
+        task.spawn(function() 
+			while Options.AutoSlimeGun.Value == true do
+				local success,response = pcall(function() 
+					for _,enemy in pairs(FindEnemies()) do
+						if enemy then
+							repeat 
+								FireSlimeGun(tonumber(enemy.Name))
+								task.wait(0.05)
+							until not enemy.Parent or Options.AutoSlimeGun.Value == false
+						end
+					end
+				end)
+				
+				if success then
+					continue
+				else
+					print(response)
+					continue
+				end
+			end
+		end)
+	end)
+			
 
 	 Tabs.Upgrades:AddParagraph({
         Title = "Auto Upgrade works on a interval.",
@@ -446,17 +515,7 @@ do
 		end)
     end)
 
-	local AutoPotions = Tabs.Main:AddToggle("AutoPotions", {Title = "Auto Potions", Default = false })
 
-    AutoPotions:OnChanged(function()
-		Notify("Auto Potions Toggled", tostring(Options.AutoPotions.Value))
-        task.spawn(function() 
-			while Options.AutoPotions.Value == true do
-				ConsumePotions()
-				task.wait(3)
-			end
-		end)
-    end)
 
 	local AutoEquipBest = Tabs.Upgrades:AddToggle("AutoEquipBest", {Title = "Auto Equip Best", Default = false })
 
@@ -473,6 +532,8 @@ do
 			end
 		end)
     end)
+
+
 
 
 	--Webhooks
